@@ -43,9 +43,9 @@ public class Main {
 				}
 
 				// System.out.println(req + "\nline:" + line);
-				Request.parseReqPath(req);
-				Request.parseReqMethod(req);
-				Server.parseHost(req);
+				Request.getReqPath(req);
+				Request.getReqMethod(req);
+				Server.getHost(req);
 
 				dirIndex = 0;
 				String fileContent = Content.getFileContent();

@@ -81,7 +81,7 @@ public class Content {
 			// No index.html
 			else {
 				Main.dirIndex = 2;
-				fileContent = generateDirectoryPage(getListDir(f));
+				fileContent = generateDirPage(getListDir(f));
 			}
 		}
 		// Not Found
@@ -95,7 +95,7 @@ public class Content {
 		return fileContent;
 	}
 
-	public static String generateDirectoryPage(File[] listDir) {
+	public static String generateDirPage(File[] listDir) {
 		//
 		String fileContent = "";
 		fileContent += "<!DOCTYPE html>\r\n" +
@@ -134,7 +134,7 @@ public class Content {
 		if (Main.dirIndex != 2) {
 			Path path = Paths.get(fullPath);
 			Path fileName = path.getFileName();
-			mimeType = getFileMimeType(fileName.toString());
+			mimeType = getFileType(fileName.toString());
 		} else if (Main.dirIndex == 2) {
 			mimeType = "text/html";
 		}
@@ -162,7 +162,7 @@ public class Content {
 		return response + content;
 	}
 
-    public static String getFileMimeType(String filename) {
+    public static String getFileType(String filename) {
 
 		FileInputStream fis;
 		BufferedInputStream bis;

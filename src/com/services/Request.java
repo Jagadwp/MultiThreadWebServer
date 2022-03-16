@@ -10,7 +10,7 @@ import com.app.Main;
 
 
 public class Request {
-    public static void parseReqPath(String reqHeader) {
+    public static void getReqPath(String reqHeader) {
 		//
 		String pattern = "GET ([^\\s]+)";
 		Pattern r = Pattern.compile(pattern);
@@ -30,7 +30,7 @@ public class Request {
 		}
 	}
 
-	public static void parseReqMethod(String reqHeader) {
+	public static void getReqMethod(String reqHeader) {
 		//
 		String pattern = "([^\\s]+)";
 		Pattern r = Pattern.compile(pattern);

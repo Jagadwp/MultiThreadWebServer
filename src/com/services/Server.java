@@ -43,7 +43,7 @@ public class Server {
 		}
 	}
 
-	public static void parseHost(String reqHeader) {
+	public static void getHost(String reqHeader) {
 		//
 		String host = "";
 		String pattern = "Host: ([^\n]+)";
