@@ -12,13 +12,8 @@ import com.services.*;
 
 public class Main {
 
-	public static String reqMethod;
-	public static String reqPath;
-	public static String rootDir;
-	public static String ipAddress;
-	public static String port;
-	public static String status;
-	public static int dirIndex;
+	public static String requestMethod, requestPath, rootDir, ip, port, status;
+	public static int pageType;
 
 	public static void main(String[] args) {
 		Server.getServerConfig();
@@ -33,25 +28,25 @@ public class Main {
 				BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
 				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
 
-				String req = "";
-				String line = br.readLine();
-				req += line + "\n";
+				String request = "";
+				String input = br.readLine();
+				request += input + "\n";
 
-				while (!line.isEmpty()) {
-					line = br.readLine();
-					req += line + "\n";
+				while (!input.isEmpty()) {
+					input = br.readLine();
+					request += input + "\n";
 				}
 
-				// System.out.println(req + "\nline:" + line);
-				Request.getReqPath(req);
-				Request.getReqMethod(req);
-				Server.getHost(req);
+				// System.out.println("req:\n" + request + "\nline:" + input);
+				Request.getRequestPath(request);
+				Request.getRequestMethod(request);
+				Server.getHost(request);
 
-				dirIndex = 0;
+				pageType = 0;
 				String fileContent = Content.getFileContent();
-				String res = Content.generateResponse(fileContent);
+				String result = Content.getResponse(fileContent);
 
-				bw.write(res);
+				bw.write(result);
 				bw.flush();
 
 				client.close();

@@ -37,8 +37,8 @@ public class Server {
 		if (m.find()) {
 			Main.rootDir = m.group(1);
 			Main.rootDir = Main.rootDir.substring(0, Main.rootDir.length() - 1);
-			Main.ipAddress = m.group(2);
-			Main.ipAddress = Main.ipAddress.substring(0, Main.ipAddress.length() - 1);
+			Main.ip = m.group(2);
+			Main.ip = Main.ip.substring(0, Main.ip.length() - 1);
 			Main.port = m.group(3);
 		}
 	}
@@ -53,7 +53,6 @@ public class Server {
 			host = m.group(1);
 		}
 
-		// Ambil config rootdir virtual host
 		if (!host.equals("localhost")) {
 			FileInputStream fis;
 			BufferedInputStream bis;

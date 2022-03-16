@@ -10,38 +10,37 @@ import com.app.Main;
 
 
 public class Request {
-    public static void getReqPath(String reqHeader) {
-		//
+    public static void getRequestPath(String reqHeader) {
 		String pattern = "GET ([^\\s]+)";
 		Pattern r = Pattern.compile(pattern);
 		Matcher m = r.matcher(reqHeader);
 		if (m.find()) {
-			Main.reqPath = m.group(1);
-			Main.reqPath = Main.reqPath.substring(1);
+			Main.requestPath = m.group(1);
+			Main.requestPath = Main.requestPath.substring(1);
 		}
-		if (Main.reqPath.equals("\\")) {
-			Main.reqPath = "";
+		if (Main.requestPath.equals("\\")) {
+			Main.requestPath = "";
 		}
 
 		try {
-			Main.reqPath = URLDecoder.decode(Main.reqPath, StandardCharsets.UTF_8.name());
+			Main.requestPath = URLDecoder.decode(Main.requestPath, StandardCharsets.UTF_8.name());
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void getReqMethod(String reqHeader) {
+	public static void getRequestMethod(String reqHeader) {
 		//
 		String pattern = "([^\\s]+)";
 		Pattern r = Pattern.compile(pattern);
 		Matcher m = r.matcher(reqHeader);
 		if (m.find()) {
-			Main.reqMethod = m.group(1);
+			Main.requestMethod = m.group(1);
 		}
 	}
 
     
-	public static String getReqHeader(String req) {
+	public static String getRequestHeader(String req) {
 		//
 		String header = req.split("\r\n\r\n")[0];
 		return header;

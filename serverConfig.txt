@@ -1,6 +1,4 @@
 rootDir=E:\\JAGAD\\
 ip=192.168.1.5
 port=80
-
-# VirtualHost: <Nama Domain> <Root Folder>
 VirtualHost: ok.mantab.com E:\\BuktiBeasiswaBUMI\\

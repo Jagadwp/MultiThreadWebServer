@@ -15,16 +15,13 @@ import org.apache.commons.io.FileUtils;
 
 import com.app.Main;
 
-
 public class Content {
-    
+
 	public static String getFileContent() {
-		//
-		String fullPath = Main.rootDir + Main.reqPath;
+		String fullPath = Main.rootDir + Main.requestPath;
 		String fileContent = "";
 
 		File f = new File(fullPath);
-		// File found
 		if (f.isFile()) {
 			FileInputStream fis;
 			BufferedInputStream bis;
@@ -44,20 +41,18 @@ public class Content {
 				fis.close();
 			} catch (FileNotFoundException e) {
 				Main.status = "404 Not Found";
-				return "File Not Found";
+				return "file tidak ditemukan";
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} else if (f.exists()) {
-			// Check index.html
-			File f2 = new File(Main.rootDir + Main.reqPath + "\\index.html");
+			File f2 = new File(Main.rootDir + Main.requestPath + "\\index.html");
 			if (f2.exists()) {
 				FileInputStream fis;
 				BufferedInputStream bis;
-				Main.dirIndex = 1;
+				Main.pageType = 1;
 				try {
 					fullPath += "\\index.html";
-					// System.out.println(fullPath);
 					fis = new FileInputStream(fullPath);
 
 					bis = new BufferedInputStream(fis);
@@ -73,44 +68,38 @@ public class Content {
 					fis.close();
 				} catch (FileNotFoundException e) {
 					Main.status = "404 Not Found";
-					return "File Not Found";
+					return "file tidak ditemukan";
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+			} else {
+				Main.pageType = 2;
+				fileContent = getDirPage(getListDir(f));
 			}
-			// No index.html
-			else {
-				Main.dirIndex = 2;
-				fileContent = generateDirPage(getListDir(f));
-			}
-		}
-		// Not Found
-		else {
-			// System.out.println("ganemu");
+		} else {
 			Main.status = "404 Not Found";
-			return "File Not Found";
+			return "file tidak ditemukan";
 		}
-		// Success
+
 		Main.status = "200 OK";
 		return fileContent;
 	}
 
-	public static String generateDirPage(File[] listDir) {
-		//
+	public static String getDirPage(File[] listDir) {
 		String fileContent = "";
 		fileContent += "<!DOCTYPE html>\r\n" +
 				"<html>\r\n" +
 				"<head>\r\n" +
-				"<title>/" + Main.reqPath + "</title>\r\n" +
+				"<title>/" + Main.requestPath + "</title>\r\n" +
 				"</head>\r\n" +
 				"<body>";
+
 		for (File file : listDir) {
 			fileContent += "<a href='";
-			if (!Main.reqPath.isEmpty())
+			if (!Main.requestPath.isEmpty())
 				fileContent += "/";
-			fileContent += Main.reqPath + "/" + file.getName() + "'>" +
-					Main.reqPath + "/" + file.getName() + "</a></br>";
-			// System.out.println("Path: " + Main.reqPath);
+			fileContent += Main.requestPath + "/" + file.getName() + "'>" +
+					Main.requestPath + "/" + file.getName() + "</a></br>";
 		}
 		fileContent += "</body>\r\n" +
 				"</html>";
@@ -118,24 +107,23 @@ public class Content {
 	}
 
 	public static File[] getListDir(File dir) {
-		//
 		File filesList[] = dir.listFiles();
 
 		return filesList;
 	}
 
-	public static String generateResponse(String content) {
+	public static String getResponse(String content) {
 		//
-		String fullPath = Main.rootDir + Main.reqPath;
+		String fullPath = Main.rootDir + Main.requestPath;
 		String mimeType = "";
-		if (Main.dirIndex == 1)
+		if (Main.pageType == 1)
 			fullPath += "\\index.html";
 
-		if (Main.dirIndex != 2) {
+		if (Main.pageType != 2) {
 			Path path = Paths.get(fullPath);
 			Path fileName = path.getFileName();
 			mimeType = getFileType(fileName.toString());
-		} else if (Main.dirIndex == 2) {
+		} else if (Main.pageType == 2) {
 			mimeType = "text/html";
 		}
 
@@ -162,7 +150,7 @@ public class Content {
 		return response + content;
 	}
 
-    public static String getFileType(String filename) {
+	public static String getFileType(String filename) {
 
 		FileInputStream fis;
 		BufferedInputStream bis;
