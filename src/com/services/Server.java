@@ -44,7 +44,6 @@ public class Server {
 	}
 
 	public static void getHost(String reqHeader) {
-		//
 		String host = "";
 		String pattern = "Host: ([^\n]+)";
 		Pattern r = Pattern.compile(pattern);

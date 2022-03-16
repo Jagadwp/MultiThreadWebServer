@@ -113,7 +113,6 @@ public class Content {
 	}
 
 	public static String getResponse(String content) {
-		//
 		String fullPath = Main.rootDir + Main.requestPath;
 		String mimeType = "";
 		if (Main.pageType == 1)

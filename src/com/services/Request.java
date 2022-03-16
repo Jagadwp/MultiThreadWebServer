@@ -30,7 +30,6 @@ public class Request {
 	}
 
 	public static void getRequestMethod(String reqHeader) {
-		//
 		String pattern = "([^\\s]+)";
 		Pattern r = Pattern.compile(pattern);
 		Matcher m = r.matcher(reqHeader);
@@ -41,7 +40,6 @@ public class Request {
 
     
 	public static String getRequestHeader(String req) {
-		//
 		String header = req.split("\r\n\r\n")[0];
 		return header;
 	}

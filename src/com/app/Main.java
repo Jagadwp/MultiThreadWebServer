@@ -38,9 +38,9 @@ public class Main {
 				}
 
 				// System.out.println("req:\n" + request + "\nline:" + input);
+				Server.getHost(request);
 				Request.getRequestPath(request);
 				Request.getRequestMethod(request);
-				Server.getHost(request);
 
 				pageType = 0;
 				String fileContent = Content.getFileContent();
