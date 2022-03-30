@@ -7,99 +7,30 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.nio.file.Files;
 
-import org.apache.commons.io.FileUtils;
+// import org.apache.commons.io.FileUtils;
 
-import com.app.Main;
+import com.app.ClientThread;
 
 public class Content {
-
-	public static String getFileContent() {
-		String fullPath = Main.rootDir + Main.requestPath;
-		String fileContent = "";
-
-		File f = new File(fullPath);
-		if (f.isFile()) {
-			FileInputStream fis;
-			BufferedInputStream bis;
-			try {
-				fis = new FileInputStream(fullPath);
-
-				bis = new BufferedInputStream(fis);
-				byte[] bRes = new byte[1024];
-				int c = bis.read(bRes);
-
-				while (c != -1) {
-					fileContent += (new String(bRes));
-					c = bis.read(bRes);
-				}
-
-				bis.close();
-				fis.close();
-			} catch (FileNotFoundException e) {
-				Main.status = "404 Not Found";
-				return "file tidak ditemukan";
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else if (f.exists()) {
-			File f2 = new File(Main.rootDir + Main.requestPath + "\\index.html");
-			if (f2.exists()) {
-				FileInputStream fis;
-				BufferedInputStream bis;
-				Main.pageType = 1;
-				try {
-					fullPath += "\\index.html";
-					fis = new FileInputStream(fullPath);
-
-					bis = new BufferedInputStream(fis);
-					byte[] bRes = new byte[1024];
-					int c = bis.read(bRes);
-
-					while (c != -1) {
-						fileContent += (new String(bRes));
-						c = bis.read(bRes);
-					}
-
-					bis.close();
-					fis.close();
-				} catch (FileNotFoundException e) {
-					Main.status = "404 Not Found";
-					return "file tidak ditemukan";
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			} else {
-				Main.pageType = 2;
-				fileContent = getDirPage(getListDir(f));
-			}
-		} else {
-			Main.status = "404 Not Found";
-			return "file tidak ditemukan";
-		}
-
-		Main.status = "200 OK";
-		return fileContent;
-	}
-
 	public static String getDirPage(File[] listDir) {
 		String fileContent = "";
 		fileContent += "<!DOCTYPE html>\r\n" +
 				"<html>\r\n" +
 				"<head>\r\n" +
-				"<title>/" + Main.requestPath + "</title>\r\n" +
+				"<title>/" + ClientThread.requestPath + "</title>\r\n" +
 				"</head>\r\n" +
 				"<body>";
 
 		for (File file : listDir) {
 			fileContent += "<a href='";
-			if (!Main.requestPath.isEmpty())
+			if (!ClientThread.requestPath.isEmpty())
 				fileContent += "/";
-			fileContent += Main.requestPath + "/" + file.getName() + "'>" +
-					Main.requestPath + "/" + file.getName() + "</a></br>";
+			fileContent += ClientThread.requestPath + "/" + file.getName() + "'>" +
+					ClientThread.requestPath + "/" + file.getName() + "</a></br>";
 		}
 		fileContent += "</body>\r\n" +
 				"</html>";
@@ -112,41 +43,60 @@ public class Content {
 		return filesList;
 	}
 
-	public static String getResponse(String content) {
-		String fullPath = Main.rootDir + Main.requestPath;
+	public static String getResponse(long contentLength) {
+		String fullPath = ClientThread.rootDir + ClientThread.requestPath;
 		String mimeType = "";
-		if (Main.pageType == 1)
+
+		if (isFolder(fullPath) && (new File(fullPath + "\\index.html")).exists())
 			fullPath += "\\index.html";
 
-		if (Main.pageType != 2) {
+		if (isFolder(fullPath) && !(new File(fullPath + "\\index.html")).exists()) {
+			mimeType = "text/html";
+		} else {
 			Path path = Paths.get(fullPath);
 			Path fileName = path.getFileName();
 			mimeType = getFileType(fileName.toString());
-		} else if (Main.pageType == 2) {
-			mimeType = "text/html";
+			System.out.println(fileName.toString());
+		}
+
+		String response = "HTTP/1.0 " + ClientThread.status+ "\r\n";
+		response += "Content-Type: " + mimeType + "\r\n";
+		response += "Content-Length: " + contentLength + "\r\n";
+		response += "Connection: " + ClientThread.reqConnection + "\r\n";
+
+		if (ClientThread.reqConnection.contains("keep-alive")) {
+			response += "Keep-Alive: timeout=2; max=1000\r\n";
 		}
 
 		if (mimeType.contains("image")) {
-			byte[] fileContent;
-			content = "";
-			try {
-				fileContent = FileUtils.readFileToByteArray(new File(fullPath));
-				content = Base64.getEncoder().encodeToString(fileContent);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			content = "<img src='data:" + mimeType + ";base64," + content + "'>";
-
-			mimeType = "text/html";
+			File f = new File(fullPath);
+			response += "Content-Disposition: inline; " + f.getName() + "\r\n";
+		} else if (!isFolder(fullPath) && !mimeType.contains("text")) {
+			File f = new File(fullPath);
+			response += "Content-Disposition: attachment; " + f.getName() + "\r\n";
 		}
 
-		String response = "HTTP/1.0 " + Main.status + "\r\n";
-		response += "Content-Type: " + mimeType + "\r\n";
-		response += "Content-Length: " + content.length() + "\r\n";
 		response += "\r\n";
+		System.out.println(response);
+		return response;
+	}
 
-		return response + content;
+	public static long getFileLength() {
+		String fullPath = ClientThread.rootDir + ClientThread.requestPath;
+		Path path = Paths.get(fullPath);
+
+		File f = new File(fullPath);
+		if (isFolder(fullPath)) {
+			return getDirPage(getListDir(f)).length();
+		}
+
+		try {
+			long bytes = Files.size(path);
+			return bytes;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 
 	public static String getFileType(String filename) {
@@ -186,5 +136,12 @@ public class Content {
 			return m.group(1);
 		}
 		return "";
+	}
+
+	public static boolean isFolder(String path) {
+		File f = new File(path);
+		if (!f.isFile() && f.exists())
+			return true;
+		return false;
 	}
 }

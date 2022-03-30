@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.app.Main;
+import com.app.ClientThread;
 
 
 public class Request {
@@ -15,28 +15,28 @@ public class Request {
 		Pattern r = Pattern.compile(pattern);
 		Matcher m = r.matcher(reqHeader);
 		if (m.find()) {
-			Main.requestPath = m.group(1);
-			Main.requestPath = Main.requestPath.substring(1);
+			ClientThread.requestPath = m.group(1);
+			ClientThread.requestPath = ClientThread.requestPath.substring(1);
 		}
-		if (Main.requestPath.equals("\\")) {
-			Main.requestPath = "";
+		if (ClientThread.requestPath.equals("\\")) {
+			ClientThread.requestPath = "";
 		}
 
 		try {
-			Main.requestPath = URLDecoder.decode(Main.requestPath, StandardCharsets.UTF_8.name());
+			ClientThread.requestPath = URLDecoder.decode(ClientThread.requestPath, StandardCharsets.UTF_8.name());
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void getRequestMethod(String reqHeader) {
-		String pattern = "([^\\s]+)";
-		Pattern r = Pattern.compile(pattern);
-		Matcher m = r.matcher(reqHeader);
-		if (m.find()) {
-			Main.requestMethod = m.group(1);
-		}
-	}
+	// public static void getRequestMethod(String reqHeader) {
+	// 	String pattern = "([^\\s]+)";
+	// 	Pattern r = Pattern.compile(pattern);
+	// 	Matcher m = r.matcher(reqHeader);
+	// 	if (m.find()) {
+	// 		ClientThread.requestMethod = m.group(1);
+	// 	}
+	// }
 
     
 	public static String getRequestHeader(String req) {

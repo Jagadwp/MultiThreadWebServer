@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.app.Main;
+import com.app.ClientThread;
 
 public class Server {
 	public static void getServerConfig() {
@@ -35,11 +35,11 @@ public class Server {
 		Pattern r = Pattern.compile(pattern);
 		Matcher m = r.matcher(tmp);
 		if (m.find()) {
-			Main.rootDir = m.group(1);
-			Main.rootDir = Main.rootDir.substring(0, Main.rootDir.length() - 1);
-			Main.ip = m.group(2);
-			Main.ip = Main.ip.substring(0, Main.ip.length() - 1);
-			Main.port = m.group(3);
+			ClientThread.rootDir = m.group(1);
+			ClientThread.rootDir = ClientThread.rootDir.substring(0, ClientThread.rootDir.length() - 1);
+			ClientThread.ip = m.group(2);
+			ClientThread.ip = ClientThread.ip.substring(0, ClientThread.ip.length() - 1);
+			ClientThread.port = m.group(3);
 		}
 	}
 
@@ -77,7 +77,7 @@ public class Server {
 			r = Pattern.compile(pattern);
 			m = r.matcher(tmp);
 			if (m.find()) {
-				Main.rootDir = m.group(1);
+				ClientThread.rootDir = m.group(1);
 			}
 		}
 	}

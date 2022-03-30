@@ -1,60 +1,70 @@
 package com.app;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import com.services.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
 
-	public static String requestMethod, requestPath, rootDir, ip, port, status;
-	public static int pageType;
+	public static String rootDir, ip, port;
 
 	public static void main(String[] args) {
-		Server.getServerConfig();
+		getServerConfig();
 
 		try {
 			System.out.println(Integer.parseInt(port));
 			ServerSocket server = new ServerSocket(Integer.parseInt(port));
-
+			
 			while (true) {
-				Socket client = server.accept();
-
-				BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
-				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
-
-				String request = "";
-				String input = br.readLine();
-				request += input + "\n";
-
-				while (!input.isEmpty()) {
-					input = br.readLine();
-					request += input + "\n";
-				}
-
-				// System.out.println("req:\n" + request + "\nline:" + input);
-				Server.getHost(request);
-				Request.getRequestPath(request);
-				Request.getRequestMethod(request);
-
-				pageType = 0;
-				String fileContent = Content.getFileContent();
-				String result = Content.getResponse(fileContent);
-
-				bw.write(result);
-				bw.flush();
-
-				client.close();
-				Server.getServerConfig();
+                server.setSoTimeout(0);
+                Socket client = server.accept();
+                server.setSoTimeout(5000);
+                (new ClientThread(client)).start();
 			}
+		}
+		catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+
+	public static void getServerConfig() {
+		FileInputStream fis;
+		BufferedInputStream bis;
+		String tmp = "";
+		try {
+			fis = new FileInputStream("serverConfig.txt");
+			bis = new BufferedInputStream(fis);
+			
+			byte[] c;
+			c = new byte[bis.available()];
+			bis.read(c);
+			tmp = new String(c);
+			
+			bis.close();
+			fis.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		String pattern = "rootDir=([^\n]+)\nip=([^\n]+)\nport=([\\d]+)";
+		Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(tmp);
+        if (m.find()) {
+            rootDir = m.group(1);
+            rootDir = rootDir.substring(0, rootDir.length()-1);
+            ip = m.group(2);
+            ip = ip.substring(0, ip.length()-1);
+            port = m.group(3);
+        }
 	}
+
 
 }
